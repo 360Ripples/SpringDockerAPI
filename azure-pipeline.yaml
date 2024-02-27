@@ -1,0 +1,55 @@
+variables:
+  vmImage: RipplesSelfHostedPool
+
+trigger:
+  - main
+
+stages:
+  - stage: Build
+    jobs:
+      - job: BuildJob
+        displayName: "Build"
+        pool: $(vmImage)
+        steps:
+          - checkout: self
+          - task: Maven@3
+            inputs:
+              mavenPomFile: "pom.xml"
+              goals: "clean package"
+
+          - task: Docker@2
+            inputs:
+              containerRegistry: "Shanmu Docker Hub" # Modify this with your Docker registry connection
+              repository: "shanmutp/spring_image:latest" # Modify this with your Docker image repository name
+              command: "build"
+              Dockerfile: "**/Dockerfile"
+              tags: "latest"
+              buildContext: "$(Build.SourcesDirectory)/target" 
+
+  #- stage: Test
+  #  jobs:
+  # - job: TestJob
+  #    displayName: 'Test'
+  #   dependsON: Build
+  #  condition: succeeded()
+  # pool:
+  #  vmImage: 'ubuntu-latest'
+  #steps:
+  #- checkout: self
+  #- script: echo Running tests...
+
+  #- stage: Deploy
+  # jobs:
+  #  - job: DeployJob
+  #   displayName: "Deploy"
+  #  dependsON: Build
+  # condition: succeeded()
+  #pool: $(vmImage)
+  #steps:
+  # - checkout: self
+
+  #- task: DeployToAzureWebApp@1
+  # inputs:
+  #  azureSubscription: "YourAzureServiceConnection"
+  # appType: "webApp"
+  #appName: "your-app-name"

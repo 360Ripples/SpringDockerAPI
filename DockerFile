@@ -1,0 +1,29 @@
+# YAML file to build a image from linux and java
+# Use an official Java runtime as a parent image
+#FROM openjdk:11-jre-slim
+#FROM eclipse-temurin:17.0.8.1_1-jre-jammy
+#FROM bitnami/java:latest
+#FROM tomcat:9.0.82-jre21
+#FROM tajdocker1/tomcatjdk9:allmvr
+FROM tomcat:latest
+
+# Configuration and installation
+RUN mkdir /home/SpringApp
+#RUN apt-get update && apt-get install -y git
+#RUN apt-get install -y maven
+#ENV M2_HOME=/usr/share/maven
+
+WORKDIR /home/SpringApp
+# Copying source files from Git
+# Copy the packaged JAR file into the container at the specified working directory
+COPY target/DockerSpringAPI.jar /home/SpringApp/your-spring-app.jar
+
+# Expose the default Tomcat port
+EXPOSE 8080
+
+# Start the spring boot  application
+CMD ["java", "-jar", "DockerSpringAPI.jar"]
+
+
+
+ 
