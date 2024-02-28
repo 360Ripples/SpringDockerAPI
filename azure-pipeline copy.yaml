@@ -3,6 +3,7 @@ variables:
 
 trigger:
   - main
+
 stages:
   - stage: Build
     jobs:
@@ -19,35 +20,41 @@ stages:
           - task: Docker@2
             inputs:
               containerRegistry: "Shanmu Docker Hub" # Modify this with your Docker registry connection
-              repository: "shanmutp/azure_pipeline_spring" # Modify this with your Docker image repository name
+              repository: "shanmutp/spring_image_azure" # Modify this with your Docker image repository name
               command: "build"
               Dockerfile: "**/DockerFile"
               tags: "latest"
-              buildContext: "$(Build.SourcesDirectory)"
+              buildContext: "$(Build.SourcesDirectory)/target"
 
           - task: Docker@2
             inputs:
               containerRegistry: "Shanmu Docker Hub" # Modify this with your Docker registry connection
-              repository: "shanmutp/azure_pipeline_spring" # Modify this with your Docker image repository name
+              repository: "shanmutp/spring_image_azure" # Modify this with your Docker image repository name
               command: "push"
               tags: "latest"
-  
+
+  #- stage: Test
+  #  jobs:
+  # - job: TestJob
+  #    displayName: 'Test'
+  #   dependsON: Build
+  #  condition: succeeded()
+  # pool:
+  #  vmImage: 'ubuntu-latest'
+  #steps:
+  #- checkout: self
+  #- script: echo Running tests...
+
   - stage: Deploy
     jobs:
       - job: DeployJob
         displayName: "Deploy"
         pool: $(vmImage)
-        steps:          
+        steps:
+          - checkout: self
           - task: AzureRmWebAppDeployment@4
             inputs:
-              ConnectionType: 'AzureRM'
-              azureSubscription: 'AzureWebAppPipelineServiceConnection'
-              appType: 'webAppContainer'
-              WebAppName: 'AzurePipeSpringDemoWebApp'
-              DockerNamespace: 'shanmutp'
-              DockerRepository: ' azure_pipeline_spring'
-              DockerImageTag: 'latest'              
-              RuntimeStack: 'DOCKER|latest'  # Specify the Docker runtime stack
-              StartupCommand: ''  # Leave blank for Docker containers
-              ResourceGroupName: 'rg-Web-app'
-              
+              azureSubscription: "AzureSpringBootWebServer"
+              appType: "webApp"
+              appName: "RipplesSpringBootWebApp"
+              containers: "shanmutp/spring_image_azure"

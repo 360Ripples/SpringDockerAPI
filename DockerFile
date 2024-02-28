@@ -8,21 +8,21 @@
 FROM tomcat:latest
 
 # Configuration and installation
-RUN mkdir /home/SpringApp
+RUN mkdir /appDemo
 #RUN apt-get update && apt-get install -y git
 #RUN apt-get install -y maven
 #ENV M2_HOME=/usr/share/maven
 
-WORKDIR /home/SpringApp
+WORKDIR /appDemo
 # Copying source files from Git
 # Copy the packaged JAR file into the container at the specified working directory
-COPY target/DockerSpringAPI.jar /home/SpringApp/your-spring-app.jar
+COPY  target/DockerSpringAPI.jar /appDemo/DockerSpringAPI.jar
 
 # Expose the default Tomcat port
 EXPOSE 8080
 
 # Start the spring boot  application
-CMD ["java", "-jar", "DockerSpringAPI.jar"]
+CMD ["java", "-jar", "/appDemo/DockerSpringAPI.jar"]
 
 
 
